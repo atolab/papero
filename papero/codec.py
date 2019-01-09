@@ -23,8 +23,8 @@ def encode_sequence(buf, xs, encoder):
         encoder(buf, x)
 
 def  decode_sequence(buf, decoder):    
-    n = buf.get_vle()    
-    print("Deconding e sequence of {} elems".format(n))
+    n = buf.get_vle()   
+    print("Decoding a sequence of {} elems".format(n)) 
     xs = []
     for _ in range(0, n):
         xs.append(decoder(buf))
@@ -35,5 +35,5 @@ def encode_properties(buf, ps):
         encode_sequence(buf, ps, encode_property)
 
 def decode_properties(buf):
-    decode_sequence(buf, decode_property)
+    return decode_sequence(buf, decode_property)
     

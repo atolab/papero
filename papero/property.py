@@ -5,7 +5,7 @@ class Property(object):
 
 def find_property(name, ps):    
     for p in ps:
-        if ps.name == name:
-            return ps.value
+        if p.key == name:
+            return p.value
     
     return None
