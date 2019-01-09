@@ -24,7 +24,6 @@ def encode_sequence(buf, xs, encoder):
 
 def  decode_sequence(buf, decoder):    
     n = buf.get_vle()   
-    print("Decoding a sequence of {} elems".format(n)) 
     xs = []
     for _ in range(0, n):
         xs.append(decoder(buf))
