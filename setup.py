@@ -8,7 +8,7 @@ def read(fname):
 
 setup(
     name='papero',
-    version='0.1.0',
+    version='0.1.1',
     packages=['papero'],
     author='kydos',
     description="Python's Apero",

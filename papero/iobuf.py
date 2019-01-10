@@ -99,8 +99,10 @@ class IOBuf(object):
         self.read_pos += n        
         return bs 
 
-    def put_string(self, s):        
-        self.put_bytes(s.encode())
+    def put_string(self, s):
+        if s == "":
+            s = " "
+        self.put_bytes(s.encode("utf-8"))
 
     def get_string(self):        
         bs = self.get_bytes()

@@ -23,7 +23,7 @@ def encode_sequence(buf, xs, encoder):
         encoder(buf, x)
 
 def  decode_sequence(buf, decoder):    
-    n = buf.get_vle()   
+    n = buf.get_vle()
     xs = []
     for _ in range(0, n):
         xs.append(decoder(buf))
