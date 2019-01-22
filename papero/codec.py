@@ -30,9 +30,21 @@ def  decode_sequence(buf, decoder):
     return xs
 
 def encode_properties(buf, ps):
-    if len(ps) != 0:    
-        encode_sequence(buf, ps, encode_property)
+    s = ''
+    length = len(ps)
+    if length > 0:
+        for i in range(0, length):
+            s = s + ps[i].key + '=' + ps[i].value
+            if i < length - 1:
+                s = s + ';'
+        buf.put_string(s)
 
 def decode_properties(buf):
-    return decode_sequence(buf, decode_property)
+    ps = []
+    s = buf.get_string()
+    s = s.split(';')
+    for ss in s:
+        p = ss.split('=')
+        ps.append(Property(p[0], p[1]))
+    return ps
     
