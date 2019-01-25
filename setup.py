@@ -3,12 +3,14 @@
 from setuptools import setup
 import os
 
+
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
+
 setup(
     name='papero',
-    version='0.2.0',
+    version='0.2.1',
     packages=['papero'],
     author='kydos',
     description="Python's Apero",
@@ -23,4 +25,4 @@ setup(
         'License :: OSI Approved :: Apache Software License',
         'License :: OSI Approved :: Eclipse Public License 2.0 (EPL-2.0)',
         "Operating System :: OS Independent"]
-    )
+)
