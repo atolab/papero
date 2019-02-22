@@ -10,7 +10,7 @@ def read(fname):
 
 setup(
     name='papero',
-    version='0.2.4',
+    version='0.2.5',
     packages=['papero'],
     author='kydos',
     description="Python's Apero",
