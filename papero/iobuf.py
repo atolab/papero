@@ -115,12 +115,10 @@ class IOBuf(object):
 
     def get_raw_bytes(self):
         a = array.array('B')
-        for i in range(0, self.write_pos):
-            a.append(self.buf[self.read_pos + i])
-        self.read_pos = self.write_pos
+        for i in range(self.read_pos, self.write_pos):
+            a.append(self.buf[i])        
         return a.tobytes()
 
     def append(self, other):
         for i in range(other.read_pos, other.write_pos):
-            self.buf.append(other.buf[i])      
-        self.write_pos += other.write_pos - other.write_pos   
+            self.put(other.buf[i])      
