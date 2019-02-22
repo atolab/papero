@@ -119,3 +119,8 @@ class IOBuf(object):
             a.append(self.buf[self.read_pos + i])
         self.read_pos = self.write_pos
         return a.tobytes()
+
+    def append(self, other):
+        for i in range(other.read_pos, other.write_pos):
+            self.buf.append(other.buf[i])      
+        self.write_pos += other.write_pos - other.write_pos   
