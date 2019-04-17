@@ -53,17 +53,12 @@ class IOBuf(object):
     def reset_read_pos(self):
         self.read_pos = 0
 
-    def put(self, b):
-        idx = self.write_pos
-        self.buf[idx] = b
+    def put(self, b):        
+        if self.write_pos == self.capacity:            
+            self.buf.extend(bytes(DEFAULT_IOBUF_SIZE))
+            self.capacity += DEFAULT_IOBUF_SIZE
+        self.buf[self.write_pos] = b
         self.write_pos += 1
-        # if self.write_pos < self.capacity:
-        #     self.buf[self.write_pos] = b
-        #     self.write_pos += 1
-        # else:
-        #     self.buf.extend(bytes(DEFAULT_IOBUF_SIZE))
-        #     self.capacity += DEFAULT_IOBUF_SIZE
-        #     self.put(b)
 
     def get(self):
         if self.read_pos < self.write_pos:
