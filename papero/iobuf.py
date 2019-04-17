@@ -1,6 +1,3 @@
-import array
-from .converter import byte_to_int
-
 DEFAULT_IOBUF_SIZE = 1024 * 64
 
 
@@ -14,35 +11,39 @@ class IOBufException(IOError):
 
 class IOBuf(object):
 
-    def __init__(self, capacity=None):
+    def __init__(self, capacity=None, init_with=None):
         self.read_pos = 0
         self.write_pos = 0
-        if capacity is None:
-            self.capacity = DEFAULT_IOBUF_SIZE
+        
+        if init_with is None:
+            if capacity is None:
+                self.capacity = DEFAULT_IOBUF_SIZE                            
+            else: 
+                self.capacity = len(init_with)
+            self.limit = self.capacity
+            self.buf = bytearray(self.capacity)        
         else:
-            self.capacity = capacity
-        self.limit = self.capacity
-        self.buf = array.array('B', (0 for i in range(self.capacity)))
+            ilen = len(init_with)
+            self.buf = bytearray(init_with)        
+            self.write_pos = ilen
+            if capacity is None:        
+                self.capacity = ilen
+            else:
+                self.capacity = max(capacity, len(init_with))
 
+    
     @staticmethod
-    def from_bytes(bs):
-        l = len(bs)
-        b = IOBuf(l)
-        for i in range(0, l):
-            b.put(byte_to_int([bs[i]]))
-        b.write_pos = l
-        return b
-
-    @staticmethod
-    def get_empty():
-        return array.array('B', (0 for i in range(DEFAULT_IOBUF_SIZE)))
+    def from_bytes(bs):        
+        return IOBuf(init_with=bs)
 
     def __str__(self):
         return 'IOBuf(read_pos:{}, write_pos:{}, capacity:{})'.format(self.read_pos,  self.write_pos, self.capacity)
 
     def hex_dump(self):
-        for i in range(0, self.write_pos):
-            print('0x{} '.format(self.buf[i]))
+        hd = ''
+        for i in range(0, self.write_pos):            
+            hd += ":" + hex(self.buf[i])
+        print(hd)
 
     def clear(self):
         self.read_pos = 0
@@ -53,13 +54,16 @@ class IOBuf(object):
         self.read_pos = 0
 
     def put(self, b):
-        if self.write_pos < self.capacity:
-            self.buf[self.write_pos] = b
-            self.write_pos += 1
-        else:
-            self.buf.extend(IOBuf.get_empty())
-            self.capacity += DEFAULT_IOBUF_SIZE
-            self.put(b)
+        idx = self.write_pos
+        self.buf[idx] = b
+        self.write_pos += 1
+        # if self.write_pos < self.capacity:
+        #     self.buf[self.write_pos] = b
+        #     self.write_pos += 1
+        # else:
+        #     self.buf.extend(bytes(DEFAULT_IOBUF_SIZE))
+        #     self.capacity += DEFAULT_IOBUF_SIZE
+        #     self.put(b)
 
     def get(self):
         if self.read_pos < self.write_pos:
@@ -93,38 +97,34 @@ class IOBuf(object):
     def put_bytes(self, bs):
         l = len(bs)
         self.put_vle(l)
-        for i in range(0, l):
-            self.put(bs[i])
+        i = self.write_pos
+        j = i + l 
+        self.buf[i:j] = bs
+        self.write_pos += l
 
     def get_bytes(self):
         n = self.get_vle()
-        bs = array.array('B')
-        for i in range(0, n):
-            bs.append(self.buf[self.read_pos + i])
+        i = self.read_pos
         self.read_pos += n
-        return bs
-
+        return self.buf[i:self.read_pos]
+        
     def put_string(self, s):
         if s == "":
             s = " "
-        self.put_bytes(s.encode("utf-8"))
+        self.put_bytes(s.encode())
 
     def get_string(self):
         bs = self.get_bytes()
-        return bs.tobytes().decode("utf-8")
+        return str(bs.decode())
 
     def get_raw_bytes(self):
-        a = array.array('B')
-        for i in range(self.read_pos, self.write_pos):
-            a.append(self.buf[i])
-        return a.tobytes()
+        return self.buf[self.read_pos:self.write_pos]        
 
     def get_n_bytes(self, n):
-        bs = array.array('B')
-        for i in range(0, n):
-            bs.append(self.buf[i])
-        self.read_pos += n
-        return bs
+        i = self.read_pos
+        j = i + n
+        self.read_pos += n        
+        return self.buf[i:j]
 
     def append(self, other):
         for i in range(other.read_pos, other.write_pos):
